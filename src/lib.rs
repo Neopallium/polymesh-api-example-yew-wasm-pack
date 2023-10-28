@@ -3,6 +3,7 @@
 mod app;
 mod components;
 mod pages;
+pub mod web3;
 
 pub use app::*;
 pub use components::*;
@@ -20,6 +21,10 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[wasm_bindgen]
 pub fn run_app() -> Result<(), JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
+    wasm_bindgen_futures::spawn_local(async move {
+      let extensions = web3::enable().await;
+      log::info!("extensions = {:?}", extensions);
+    });
     yew::Renderer::<app::App>::new().render();
     Ok(())
 }

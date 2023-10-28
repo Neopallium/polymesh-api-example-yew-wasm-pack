@@ -6,7 +6,9 @@ const distPath = path.resolve(__dirname, "dist");
 module.exports = (env, argv) => {
   return {
     devServer: {
-      contentBase: distPath,
+      static: {
+        directory: distPath,
+      },
       compress: argv.mode === 'production',
       port: 8000
     },
@@ -16,8 +18,24 @@ module.exports = (env, argv) => {
       filename: "polymesh_yew.js",
       webassemblyModuleFilename: "polymesh_yew.wasm"
     },
+    experiments: {
+      asyncWebAssembly: true,
+      syncWebAssembly: true
+    },
     module: {
       rules: [
+        {
+          test: /\.(?:js|mjs|cjs)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ['@babel/preset-env', { targets: "defaults" }]
+              ]
+            }
+          }
+        },
         {
           test: /\.s[ac]ss$/i,
           use: [

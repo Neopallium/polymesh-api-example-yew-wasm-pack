@@ -14,7 +14,10 @@ categories = ["gui", "wasm", "web-programming"]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-wasm-bindgen = "0.2.58"
+js-sys = "0.3"
+web-sys = { version = "0.3.4", features = [ 'KeyboardEvent'] }
+
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
 wasm-bindgen-futures = "0.4"
 wee_alloc = { version = "0.4.4", optional = true }
 
@@ -27,7 +30,7 @@ yew-agent = { version = "0.2" }
 
 gloo-storage = { version = "0.3" }
 
-serde = { version = "1", features = ["derive"] } # You only need this if you want app persistence
+serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1.0", features = ["preserve_order"] }
 
 hex = "0.4"
@@ -36,12 +39,6 @@ wasm-logger = "0.2"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
-
-[dependencies.web-sys]
-version = "0.3.4"
-features = [
-  'KeyboardEvent',
-]
 
 [patch.crates-io]
 
