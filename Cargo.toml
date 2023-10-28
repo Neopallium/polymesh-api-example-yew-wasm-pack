@@ -24,9 +24,9 @@ wee_alloc = { version = "0.4.4", optional = true }
 tokio = { version = "1.32", features = ["rt", "sync"] }
 polymesh-api = { version = "3.2", default-features = false, features = ["wasm", "serde"] }
 
-yew = { version="0.20", features=["csr"] }
-yew-router = { version = "0.17" }
-yew-agent = { version = "0.2" }
+yew = { version="0.21", features=["csr"] }
+yew-router = { version = "0.18" }
+yew-agent = { version = "0.3" }
 
 gloo-storage = { version = "0.3" }
 

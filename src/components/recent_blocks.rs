@@ -27,7 +27,7 @@ fn view_block_item(item: &BlockItem) -> Html {
   html! {
       <tr key={ item.number.to_string() }>
           <th>{ item.number }</th>
-          <td>{ item.hash }</td>
+          <td>{ item.hash.to_string() }</td>
           <td>{ "Alice" }</td>
       </tr>
   }
