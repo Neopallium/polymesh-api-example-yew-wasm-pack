@@ -1,6 +1,12 @@
 #![recursion_limit = "512"]
 
 mod app;
+mod components;
+mod pages;
+
+pub use app::*;
+pub use components::*;
+pub use pages::*;
 
 use wasm_bindgen::prelude::*;
 
@@ -14,6 +20,6 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[wasm_bindgen]
 pub fn run_app() -> Result<(), JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::start_app::<app::App>();
+    yew::Renderer::<app::App>::new().render();
     Ok(())
 }
