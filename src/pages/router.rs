@@ -4,7 +4,7 @@ use yew_router::prelude::*;
 use crate::components::Nav;
 use crate::providers::backend::BackendContext;
 
-use crate::pages::{Accounts, Explorer, PageNotFound, Settings, Connecting};
+use crate::pages::{AccountsPage, Explorer, PageNotFound, Settings, Connecting};
 
 #[derive(Routable, PartialEq, Eq, Clone, Debug)]
 pub enum Route {
@@ -43,7 +43,7 @@ fn switch(routes: Route) -> Html {
       html! { <Explorer /> }
     }
     Route::Accounts => {
-      html! { <Accounts /> }
+      html! { <AccountsPage /> }
     }
     Route::Settings => {
       html! { <Settings /> }

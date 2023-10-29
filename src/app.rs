@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::providers::backend::BackendProvider;
 use crate::providers::blocks::BlocksProvider;
+use crate::providers::accounts::AccountsProvider;
 use crate::pages::PageRouter;
 
 const APP_KEY: &str = "example.app.polymesh.network";
@@ -41,9 +42,11 @@ impl Component for App {
   fn view(&self, _ctx: &Context<Self>) -> Html {
     html! {
         <BackendProvider>
-          <BlocksProvider>
-            <PageRouter />
-          </BlocksProvider>
+          <AccountsProvider>
+            <BlocksProvider>
+              <PageRouter />
+            </BlocksProvider>
+          </AccountsProvider>
         </BackendProvider>
     }
   }

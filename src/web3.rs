@@ -16,15 +16,6 @@ extern "C" {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Account {
-  pub address: String,
-  pub genesis_hash: Option<String>,
-  pub name: Option<String>,
-  #[serde(rename = "type")]
-  pub key_type: Option<String>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AccountMeta {
   pub genesis_hash: Option<String>,
   #[serde(default)]
@@ -33,7 +24,7 @@ pub struct AccountMeta {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct AccountWithMeta {
+pub struct Account {
   pub address: String,
   pub meta: AccountMeta,
   pub key_type: Option<String>,
@@ -104,19 +95,14 @@ pub async fn enable() -> Result<Vec<Extension>, String> {
     .map_err(fmt_err)?;
   let extensions: Vec<Extension> = from_value(list)
     .map_err(|e| e.to_string())?;
-  log::info!("extensions = {:?}", extensions);
-  let _accounts = accounts().await?;
   Ok(extensions)
 }
 
-pub async fn accounts() -> Result<Vec<AccountWithMeta>, String> {
+pub async fn accounts() -> Result<Vec<Account>, String> {
   let list = web3_get_accounts().await
     .map_err(fmt_err)?;
-  let accounts: Vec<AccountWithMeta> = from_value(list)
+  let accounts: Vec<Account> = from_value(list)
     .map_err(|e| e.to_string())?;
-  log::info!("accounts[0] = {:#?}", accounts[0]);
-  //let payload = Payload::new(accounts[0].address.clone(), "0x000000".to_string());
-  //let _sig = sign_payload(payload).await?;
   Ok(accounts)
 }
 
