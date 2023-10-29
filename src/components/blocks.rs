@@ -26,7 +26,6 @@ impl Blocks {
   fn new_header(&mut self, header: Header) {
     let hash = header.hash();
     let number = header.number;
-    log::info!("NewHeader: {}", header.number);
     let item = BlockItem {
       number,
       hash,

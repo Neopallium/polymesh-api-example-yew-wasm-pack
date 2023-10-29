@@ -3,7 +3,7 @@ use serde_wasm_bindgen::from_value;
 
 use serde::{Serialize, Deserialize};
 
-#[wasm_bindgen(module = "/web3.js")]
+#[wasm_bindgen(module = "/js/web3.js")]
 extern "C" {
   #[wasm_bindgen(catch, js_name = enableExtensions)]
   async fn web3_enable_extensions(app: &str) -> Result<JsValue, JsValue>;
@@ -114,7 +114,7 @@ pub async fn accounts() -> Result<Vec<AccountWithMeta>, String> {
     .map_err(fmt_err)?;
   let accounts: Vec<AccountWithMeta> = from_value(list)
     .map_err(|e| e.to_string())?;
-  log::info!("accounts = {:#?}", accounts);
+  log::info!("accounts[0] = {:#?}", accounts[0]);
   //let payload = Payload::new(accounts[0].address.clone(), "0x000000".to_string());
   //let _sig = sign_payload(payload).await?;
   Ok(accounts)

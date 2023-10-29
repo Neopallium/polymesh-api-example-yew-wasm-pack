@@ -18,12 +18,9 @@ js-sys = "0.3"
 web-sys = { version = "0.3.4", features = [ 'KeyboardEvent'] }
 
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
-serde-wasm-bindgen = "0.4"
 wasm-bindgen-futures = "0.4"
+serde-wasm-bindgen = "0.4"
 wee_alloc = { version = "0.4.4", optional = true }
-
-tokio = { version = "1.32", features = ["rt", "sync"] }
-polymesh-api = { version = "3.2", default-features = false, features = ["wasm", "serde"] }
 
 yew = { version="0.21", features=["csr"] }
 yew-router = { version = "0.18" }
@@ -40,6 +37,16 @@ wasm-logger = "0.2"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
+
+# native:
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { version = "1.32", features = ["full"] }
+polymesh-api = { version = "3.2", features = [] }
+
+# web:
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio = { version = "1.32", features = ["rt", "sync"] }
+polymesh-api = { version = "3.2", default-features = false, features = ["wasm", "serde"] }
 
 [patch.crates-io]
 

@@ -3,6 +3,7 @@ const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const distPath = path.resolve(__dirname, "dist");
+const jsPath = path.resolve(__dirname, "js");
 module.exports = (env, argv) => {
   return {
     devServer: {
@@ -54,6 +55,7 @@ module.exports = (env, argv) => {
       }),
       new WasmPackPlugin({
         crateDirectory: ".",
+				watchDirectories: [jsPath],
         extraArgs: "--no-typescript",
       })
     ],
