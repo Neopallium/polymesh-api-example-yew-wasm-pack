@@ -1,6 +1,6 @@
 use yew::prelude::*;
 
-use crate::components::blocks::{BlocksContext, BlockItem};
+use crate::providers::blocks::{BlocksContext, BlockItem};
 
 #[function_component]
 pub fn RecentBlocks() -> Html {

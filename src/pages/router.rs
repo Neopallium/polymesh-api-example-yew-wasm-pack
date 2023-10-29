@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 use crate::components::Nav;
-use crate::components::backend::BackendContext;
+use crate::providers::backend::BackendContext;
 
 use crate::pages::{Accounts, Explorer, PageNotFound, Settings, Connecting};
 

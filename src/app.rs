@@ -4,8 +4,8 @@ use gloo_storage::{LocalStorage, Storage};
 
 use serde::{Deserialize, Serialize};
 
-use crate::components::backend::BackendProvider;
-use crate::components::blocks::BlocksProvider;
+use crate::providers::backend::BackendProvider;
+use crate::providers::blocks::BlocksProvider;
 use crate::pages::PageRouter;
 
 const APP_KEY: &str = "example.app.polymesh.network";

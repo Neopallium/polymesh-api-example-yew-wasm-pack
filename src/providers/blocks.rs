@@ -4,9 +4,8 @@ use std::collections::BTreeMap;
 use yew::prelude::*;
 use yew::html::Scope;
 
-use crate::components::backend::*;
-
-use crate::components::backend::client::*;
+use crate::providers::backend::*;
+use crate::providers::backend::client::*;
 
 pub const MAX_BLOCKS: usize = 70;
 

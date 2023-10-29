@@ -1,11 +1,13 @@
 #![recursion_limit = "512"]
 
 mod app;
+mod providers;
 mod components;
 mod pages;
 pub mod web3;
 
 pub use app::*;
+pub use providers::*;
 pub use components::*;
 pub use pages::*;
 
