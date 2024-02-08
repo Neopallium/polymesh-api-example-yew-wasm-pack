@@ -1,7 +1,7 @@
 [package]
-name = "yew-wasm-pack-template"
-version = "0.2.0"
-authors = ["Yew Maintainers <maintainers@yew.rs"]
+name = "polymesh_yew_example"
+version = "0.1.0"
+authors = ["Robert G. Jakabosky <robert@polymesh.network>"]
 edition = "2021"
 description = "Example of using the Rust polymesh-api with Yew"
 readme = "README.md"
@@ -17,7 +17,8 @@ crate-type = ["cdylib", "rlib"]
 js-sys = "0.3"
 web-sys = { version = "0.3.4", features = [ 'KeyboardEvent'] }
 
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+#wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+wasm-bindgen = { version = "0.2" }
 wasm-bindgen-futures = "0.4"
 serde-wasm-bindgen = "0.4"
 wee_alloc = { version = "0.4.4", optional = true }
@@ -29,7 +30,7 @@ yew-agent = { version = "0.3" }
 gloo-storage = { version = "0.3" }
 
 serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1.0", features = ["preserve_order"] }
+serde_json = { version = "1.0" }
 
 hex = "0.4"
 log = "0.4"
@@ -41,14 +42,14 @@ wasm-bindgen-test = "0.3"
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { version = "1.32", features = ["full"] }
-polymesh-api = { version = "3.2", features = [] }
+polymesh-api = { version = "3.6", features = [] }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1.32", features = ["rt", "sync"] }
-polymesh-api = { version = "3.2", default-features = false, features = ["wasm", "serde"] }
+polymesh-api = { version = "3.6", default-features = false, features = ["wasm", "serde"] }
 
 [patch.crates-io]
-
-polymesh-api = { path = "../polymesh-api/" }
+#polymesh-api = { path = "../polymesh-api/" }
 #polymesh-api = { git = "https://github.com/PolymeshAssociation/polymesh-api" }
+#polymesh-api-client = { path = "../polymesh-api/crates/polymesh-api-client/" }
