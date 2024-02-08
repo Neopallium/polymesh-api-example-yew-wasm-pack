@@ -28,7 +28,7 @@ impl Accounts {
       };
       self.accounts.insert(name, info);
     }
-    log::info!("accounts = {:#?}", self.accounts);
+    //log::info!("accounts = {:#?}", self.accounts);
   }
 
   pub fn iter(&self) -> impl Iterator<Item = &AccountInfo> {

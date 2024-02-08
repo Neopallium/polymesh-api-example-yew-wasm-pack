@@ -108,9 +108,7 @@ impl Component for BackendProvider {
   type Properties = BackendProviderProps;
 
   fn create(ctx: &Context<Self>) -> Self {
-    let url = "ws://localhost:9944".to_string();
     let cb = ctx.link().callback(|m| m);
-    cb.emit(BackendAction::ConnectTo(url));
     Self {
       backend: Backend::new(cb, "".into()),
     }
