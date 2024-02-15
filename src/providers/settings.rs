@@ -18,7 +18,7 @@ pub struct AppSettings {
 impl Default for AppSettings {
   fn default() -> Self {
     Self {
-      url: "ws://localhost:9844".into(),
+      url: "ws://localhost:9944".into(),
     }
   }
 }

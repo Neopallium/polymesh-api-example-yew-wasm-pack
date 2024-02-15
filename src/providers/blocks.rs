@@ -69,7 +69,7 @@ pub struct BlocksProvider {
 }
 
 impl BlocksProvider {
-  fn subscribe_blocks(&mut self, ctx: &Context<Self>) {
+  fn subscribe_blocks(&self, ctx: &Context<Self>) {
     if let Some(api) = self.backend.api() {
       let link = ctx.link().clone();
       wasm_bindgen_futures::spawn_local(async move {
@@ -95,7 +95,7 @@ impl Component for BlocksProvider {
             .link()
             .context(ctx.link().callback(Msg::BackendContextUpdated))
             .expect("No Backend Context Provided");
-    let mut provider = Self {
+    let provider = Self {
       backend,
       _context_listener: context_listener,
       blocks: Blocks::default(),

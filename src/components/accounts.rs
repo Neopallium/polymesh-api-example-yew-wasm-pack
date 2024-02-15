@@ -11,7 +11,7 @@ pub fn Accounts() -> Html {
         <table class="table is-fullwidth is-bordered">
             <thead>
                 <tr>
-                    <th colspan="3"><h1>{ "Accounts" }</h1></th>
+                    <th colspan="4"><h1>{ "Accounts" }</h1></th>
                 </tr>
             </thead>
             <tbody>
@@ -26,7 +26,8 @@ fn view_account(item: &AccountInfo) -> Html {
   html! {
       <tr key={ item.name.clone() }>
           <th>{ &item.name }</th>
-          <td>{ &item.address }</td>
+          <td>{ &item.address() }</td>
+          <td>{ &item.identity() }</td>
       </tr>
   }
 }
