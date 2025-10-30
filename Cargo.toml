@@ -47,9 +47,12 @@ polymesh-api = { version = "3.6", features = [] }
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1.32", features = ["rt", "sync"] }
-polymesh-api = { version = "3.6", default-features = false, features = ["wasm", "serde"] }
+polymesh-api = { version = "3.6", default-features = false, features = ["polymesh_v7", "wasm", "serde"] }
 
 [patch.crates-io]
-#polymesh-api = { path = "../polymesh-api/" }
+polymesh-api = { path = "../polymesh-api/" }
+polymesh-api-client = { path = "../polymesh-api/crates/polymesh-api-client/" }
 #polymesh-api = { git = "https://github.com/PolymeshAssociation/polymesh-api" }
-#polymesh-api-client = { path = "../polymesh-api/crates/polymesh-api-client/" }
+
+[profile.release]
+strip = true

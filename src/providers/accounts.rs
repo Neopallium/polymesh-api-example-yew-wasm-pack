@@ -34,7 +34,7 @@ impl AccountInfo {
         self.key_type = "Primary".to_string();
         true
       }
-      Some(KeyRecord::SecondaryKey(did, _)) => {
+      Some(KeyRecord::SecondaryKey(did)) => {
         self.identity = Some(did);
         self.key_type = "Secondary".to_string();
         true

@@ -52,6 +52,11 @@ pub fn Nav() -> Html {
                       { "Settings" }
                   </Link<Route>>
               </div>
+
+              <div class="navbar-end">
+                  <div class="navbar-item">
+                  </div>
+              </div>
           </div>
       </nav>
   }
