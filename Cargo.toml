@@ -42,16 +42,18 @@ wasm-bindgen-test = "0.3"
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { version = "1.32", features = ["full"] }
-polymesh-api = { version = "3.6", features = [] }
+polymesh-api = { version = "3.6", features = ["download_metadata"] }
 
 # web:
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1.32", features = ["rt", "sync"] }
-polymesh-api = { version = "3.6", default-features = false, features = ["polymesh_v7", "wasm", "serde"] }
+polymesh-api = { version = "3.6", default-features = false, features = ["download_metadata", "polymesh_v7", "wasm", "serde"] }
 
 [patch.crates-io]
-polymesh-api = { path = "../polymesh-api/" }
-polymesh-api-client = { path = "../polymesh-api/crates/polymesh-api-client/" }
+#polymesh-api = { path = "../polymesh-api/" }
+#polymesh-api-client = { path = "../polymesh-api/crates/polymesh-api-client/" }
+#polymesh-api-codegen = { path = "../polymesh-api/crates/polymesh-api-codegen/" }
+#polymesh-api-codegen-macro = { path = "../polymesh-api/crates/polymesh-api-codegen-macro/" }
 #polymesh-api = { git = "https://github.com/PolymeshAssociation/polymesh-api" }
 
 [profile.release]
