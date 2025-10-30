@@ -11,7 +11,7 @@ module.exports = (env, argv) => {
         directory: distPath,
       },
       compress: argv.mode === 'production',
-			historyApiFallback: true,
+      historyApiFallback: true,
       port: 8000
     },
     entry: './bootstrap.js',
@@ -43,7 +43,12 @@ module.exports = (env, argv) => {
           use: [
             'style-loader',
             'css-loader',
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                api: 'modern',
+              },
+            },
           ],
         },
       ],
@@ -56,7 +61,7 @@ module.exports = (env, argv) => {
       }),
       new WasmPackPlugin({
         crateDirectory: ".",
-				watchDirectories: [jsPath],
+        watchDirectories: [jsPath],
         extraArgs: "--no-typescript",
       })
     ],

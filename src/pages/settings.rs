@@ -1,8 +1,8 @@
-use yew::prelude::*;
+use leptos::*;
 
-#[function_component]
-pub fn Settings() -> Html {
-  html! {
+#[component]
+pub fn Settings() -> impl IntoView {
+  view! {
       <div class="tile is-ancestor is-vertical">
           <div class="tile is-child hero">
               <div class="hero-body container pb-0">

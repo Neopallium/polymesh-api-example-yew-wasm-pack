@@ -1,6 +1,4 @@
-use std::rc::Rc;
-
-use yew::prelude::*;
+use leptos::*;
 
 pub use polymesh_api::*;
 
@@ -45,41 +43,36 @@ impl PartialEq for BackendState {
 
 #[derive(Clone, PartialEq)]
 pub struct Backend {
-  cb: Callback<BackendAction>,
   epoch: usize,
   url: String,
   state: BackendState,
 }
 
 impl Backend {
-  pub fn new(cb: Callback<BackendAction>, url: String) -> Self {
+  pub fn new(url: String) -> Self {
     Self {
-      cb,
       epoch: 0,
       url,
       state: BackendState::Connecting,
     }
   }
 
-  pub fn connect_to(&self, url: String) {
+  pub fn connect_to(&mut self, url: String, set_state: WriteSignal<BackendState>) {
     if self.url != url {
-      self.cb.emit(BackendAction::ConnectTo(url));
-    }
-  }
-
-  fn update(&mut self, action: BackendAction) {
-    self.epoch += 1;
-    match action {
-      BackendAction::ConnectTo(url) => {
-        self.url = url;
-        self.state = BackendState::Connecting;
-      }
-      BackendAction::Connected(url, api) => {
-        self.url = url;
-        self.state = BackendState::Connected(api);
-      }
-      _ => {
-      }
+      self.url = url.clone();
+      self.state = BackendState::Connecting;
+      set_state.set(BackendState::Connecting);
+      
+      spawn_local(async move {
+        match Api::new(&url).await {
+          Ok(api) => {
+            set_state.set(BackendState::Connected(api));
+          }
+          Err(err) => {
+            log::error!("Failed to connect to backend: {err:?}");
+          }
+        }
+      });
     }
   }
 }
@@ -92,57 +85,29 @@ impl core::ops::Deref for Backend {
   }
 }
 
-pub type BackendContext = Rc<Backend>;
-
-pub struct BackendProvider {
-  backend: Backend,
+#[component]
+pub fn BackendProvider(children: Children) -> impl IntoView {
+  let (state, set_state) = create_signal(BackendState::Connecting);
+  let (backend, set_backend) = create_signal(Backend::new("".into()));
+  
+  provide_context(state);
+  provide_context(set_state);
+  provide_context(backend);
+  provide_context(set_backend);
+  
+  children()
 }
 
-#[derive(Properties, Debug, PartialEq)]
-pub struct BackendProviderProps {
-  pub children: Children,
+pub fn use_backend_state() -> (ReadSignal<BackendState>, WriteSignal<BackendState>) {
+  (
+    use_context::<ReadSignal<BackendState>>().expect("BackendState context"),
+    use_context::<WriteSignal<BackendState>>().expect("BackendState setter context")
+  )
 }
 
-impl Component for BackendProvider {
-  type Message = BackendAction;
-  type Properties = BackendProviderProps;
-
-  fn create(ctx: &Context<Self>) -> Self {
-    let cb = ctx.link().callback(|m| m);
-    Self {
-      backend: Backend::new(cb, "".into()),
-    }
-  }
-
-  fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-    match &msg {
-      BackendAction::ConnectTo(url) => {
-        let url = url.clone();
-        log::info!("Backend connect to: {url:?}");
-        ctx.link().send_future(async move {
-          match Api::new(&url).await {
-            Ok(api) => BackendAction::Connected(url, api),
-            Err(err) => {
-              BackendAction::BackendError(err.to_string())
-            }
-          }
-        });
-      }
-      BackendAction::BackendError(err) => {
-        log::error!("Failed to connect to backend: {err:?}");
-      }
-      _ => (),
-    }
-    self.backend.update(msg);
-    true
-  }
-
-  fn view(&self, ctx: &Context<Self>) -> Html {
-    let backend = Rc::new(self.backend.clone());
-    html! {
-      <ContextProvider<BackendContext> context={backend}>
-        { ctx.props().children.clone()}
-      </ContextProvider<BackendContext>>
-    }
-  }
+pub fn use_backend() -> (ReadSignal<Backend>, WriteSignal<Backend>) {
+  (
+    use_context::<ReadSignal<Backend>>().expect("Backend context"),
+    use_context::<WriteSignal<Backend>>().expect("Backend setter context")
+  )
 }

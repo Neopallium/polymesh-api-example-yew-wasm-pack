@@ -1,8 +1,7 @@
 use core::str::FromStr;
-use std::rc::Rc;
 use std::collections::BTreeMap;
 
-use yew::prelude::*;
+use leptos::*;
 
 use gloo_storage::{LocalStorage, Storage};
 
@@ -62,18 +61,16 @@ impl AccountInfo {
 
 #[derive(Clone, Default, PartialEq)]
 pub struct Accounts {
-  cb: Callback<Msg>,
   pub selected: String,
   pub names: Vec<String>,
   pub accounts: BTreeMap<String, AccountInfo>,
 }
 
 impl Accounts {
-  pub fn new(cb: Callback<Msg>) -> Self {
+  pub fn new() -> Self {
     let selected: String = LocalStorage::get(SELECTED_KEY).unwrap_or_default();
 
     Self {
-      cb,
       selected,
       names: Default::default(),
       accounts: Default::default(),
@@ -107,7 +104,6 @@ impl Accounts {
         self.update_selected(name);
       }
     }
-    //log::info!("accounts = {:#?}", self.accounts);
   }
 
   fn update_selected(&mut self, name: String) {
@@ -127,12 +123,6 @@ impl Accounts {
     *account = info;
   }
 
-  pub fn select_account(&self, name: String) {
-    if self.selected != name {
-      self.cb.emit(Msg::SelectedAccount(name));
-    }
-  }
-
   pub fn get_selected_account(&self) -> Option<&AccountInfo> {
     self.accounts.get(&self.selected)
   }
@@ -142,43 +132,46 @@ impl Accounts {
   }
 }
 
-pub type AccountsContext = Rc<Accounts>;
-
-pub enum Msg {
-  BackendContextUpdated(BackendContext),
-  SelectedAccount(String),
-  UpdateAccountDetails(AccountInfo),
-  Web3Enable(Result<Vec<web3::Extension>, String>),
-  Web3Accounts(Result<Vec<web3::Account>, String>),
-}
-
-pub struct AccountsProvider {
-  backend: BackendContext,
-  _context_listener: ContextHandle<BackendContext>,
-  accounts: Accounts,
-}
-
-impl AccountsProvider {
-  fn get_accounts(&self, ctx: &Context<Self>) {
-    ctx.link().send_future(async move {
-      Msg::Web3Accounts(web3::accounts().await)
+#[component]
+pub fn AccountsProvider(children: Children) -> impl IntoView {
+  let (accounts, set_accounts) = create_signal(Accounts::new());
+  let (backend_state, _) = use_backend_state();
+  
+  // Enable web3 extensions
+  create_effect(move |_| {
+    spawn_local(async move {
+      match web3::enable().await {
+        Ok(extensions) => {
+          log::info!("web3 extensions = {extensions:#?}");
+          match web3::accounts().await {
+            Ok(web3_accounts) => {
+              set_accounts.update(|acc| acc.update_accounts(web3_accounts));
+            }
+            Err(err) => {
+              log::error!("Web3 accounts failed: {err:?}");
+            }
+          }
+        }
+        Err(err) => {
+          log::error!("Web3 enable failed: {err:?}");
+        }
+      }
     });
-  }
-
-  fn update_account_details(&self, ctx: &Context<Self>) {
-    if let Some(api) = self.backend.api() {
-      let link = ctx.link().clone();
-      let accounts = self.accounts.iter().cloned().collect::<Vec<_>>();
-      wasm_bindgen_futures::spawn_local(async move {
-        for mut info in accounts {
+  });
+  
+  // Query account details when backend is connected
+  create_effect(move |_| {
+    if let BackendState::Connected(api) = backend_state.get() {
+      let account_list = accounts.get().accounts.values().cloned().collect::<Vec<_>>();
+      spawn_local(async move {
+        for mut info in account_list {
           if info.identity.is_some() {
-            // Already have the details, skip.
             continue;
           }
           match info.query_account_details(&api).await {
             Ok(true) => {
               log::info!("Got account details: {info:?}");
-              link.send_message(Msg::UpdateAccountDetails(info));
+              set_accounts.update(|acc| acc.update_account_details(info));
             }
             Ok(false) => {
               log::trace!("account doesn't have an identity");
@@ -190,70 +183,17 @@ impl AccountsProvider {
         }
       });
     }
-  }
+  });
+
+  provide_context(accounts);
+  provide_context(set_accounts);
+  
+  children()
 }
 
-#[derive(Properties, Debug, PartialEq)]
-pub struct AccountsProviderProps {
-  pub children: Children,
-}
-
-impl Component for AccountsProvider {
-  type Message = Msg;
-  type Properties = AccountsProviderProps;
-
-  fn create(ctx: &Context<Self>) -> Self {
-    let cb = ctx.link().callback(|m| m);
-    let (backend, _context_listener) = ctx
-            .link()
-            .context(ctx.link().callback(Msg::BackendContextUpdated))
-            .expect("No Backend Context Provided");
-    let provider = Self {
-      backend,
-      _context_listener,
-      accounts: Accounts::new(cb),
-    };
-    ctx.link().send_future(async move {
-      Msg::Web3Enable(web3::enable().await)
-    });
-
-    provider
-  }
-
-  fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-    match msg {
-      Msg::BackendContextUpdated(backend) => {
-        self.backend = backend;
-        self.update_account_details(ctx);
-      }
-      Msg::SelectedAccount(name) => {
-        self.accounts.update_selected(name);
-        self.update_account_details(ctx);
-      }
-      Msg::UpdateAccountDetails(info) => {
-        self.accounts.update_account_details(info);
-      }
-      Msg::Web3Enable(Ok(extensions)) => {
-        log::info!("web3 extensions = {extensions:#?}");
-        self.get_accounts(ctx);
-      }
-      Msg::Web3Accounts(Ok(accounts)) => {
-        self.accounts.update_accounts(accounts);
-        self.update_account_details(ctx);
-      }
-      Msg::Web3Enable(Err(err)) | Msg::Web3Accounts(Err(err)) => {
-        log::error!("Web3 failed: {err:?}");
-      }
-    }
-    true
-  }
-
-  fn view(&self, ctx: &Context<Self>) -> Html {
-    let accounts = Rc::new(self.accounts.clone());
-    html! {
-      <ContextProvider<AccountsContext> context={accounts}>
-        { ctx.props().children.clone()}
-      </ContextProvider<AccountsContext>>
-    }
-  }
+pub fn use_accounts() -> (ReadSignal<Accounts>, WriteSignal<Accounts>) {
+  (
+    use_context::<ReadSignal<Accounts>>().expect("Accounts context"),
+    use_context::<WriteSignal<Accounts>>().expect("Accounts setter context")
+  )
 }

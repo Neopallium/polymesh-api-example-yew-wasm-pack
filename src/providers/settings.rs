@@ -1,6 +1,4 @@
-use std::rc::Rc;
-
-use yew::prelude::*;
+use leptos::*;
 
 use serde::{Deserialize, Serialize};
 
@@ -12,88 +10,53 @@ const APP_KEY: &str = "example.app.polymesh.network";
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AppSettings {
-  pub url: String,
+    pub url: String,
 }
 
 impl Default for AppSettings {
-  fn default() -> Self {
-    Self {
-      url: "ws://localhost:9944".into(),
+    fn default() -> Self {
+        Self {
+            url: "ws://localhost:9944".into(),
+        }
     }
-  }
 }
 
 impl AppSettings {
-  pub fn update_settings(&mut self, settings: Self) {
-    *self = settings;
-    log::info!("app settings = {:#?}", self);
-  }
+    pub fn update_settings(&mut self, settings: Self) {
+        *self = settings;
+        log::info!("app settings = {:#?}", self);
+    }
 }
 
-pub type SettingsContext = Rc<AppSettings>;
-
-pub enum Msg {
-  BackendContextUpdated(BackendContext),
-}
-
-pub struct SettingsProvider {
-  backend: BackendContext,
-  _context_listener: ContextHandle<BackendContext>,
-  settings: AppSettings,
-}
-
-#[derive(Properties, Debug, PartialEq)]
-pub struct SettingsProviderProps {
-  pub children: Children,
-}
-
-impl Component for SettingsProvider {
-  type Message = Msg;
-  type Properties = SettingsProviderProps;
-
-  fn create(ctx: &Context<Self>) -> Self {
+#[component]
+pub fn SettingsProvider(children: Children) -> impl IntoView {
     let settings: AppSettings = LocalStorage::get(APP_KEY).unwrap_or_else(|_| {
-      let settings = AppSettings::default();
-      // Save settings.
-      if let Err(err) = LocalStorage::set(APP_KEY, &settings) {
-        log::error!("Failed to save settings: {err:?}");
-      }
-
-      settings
+        let settings = AppSettings::default();
+        // Save settings.
+        if let Err(err) = LocalStorage::set(APP_KEY, &settings) {
+            log::error!("Failed to save settings: {err:?}");
+        }
+        settings
     });
 
-    let (backend, _context_listener) = ctx
-            .link()
-            .context(ctx.link().callback(Msg::BackendContextUpdated))
-            .expect("No Backend Context Provided");
-    // Set backend URL.
-    backend.connect_to(settings.url.clone());
+    let (backend, set_backend) = use_backend();
+    let (_, set_state) = use_backend_state();
 
-    let provider = Self {
-      backend,
-      _context_listener,
-      settings,
-    };
+    let url = settings.url.clone();
 
-    provider
-  }
+    // Set backend URL on mount
+    create_effect(move |_| {
+        let mut b = backend.get();
+        b.connect_to(url.clone(), set_state);
+        set_backend.set(b);
+    });
 
-  fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-    match msg {
-      Msg::BackendContextUpdated(backend) => {
-        backend.connect_to(self.settings.url.clone());
-        self.backend = backend;
-      }
-    }
-    true
-  }
+    let (settings_signal, _) = create_signal(settings);
+    provide_context(settings_signal);
 
-  fn view(&self, ctx: &Context<Self>) -> Html {
-    let settings = Rc::new(self.settings.clone());
-    html! {
-      <ContextProvider<SettingsContext> context={settings}>
-        { ctx.props().children.clone()}
-      </ContextProvider<SettingsContext>>
-    }
-  }
+    children()
+}
+
+pub fn use_settings() -> ReadSignal<AppSettings> {
+    use_context::<ReadSignal<AppSettings>>().expect("Settings context")
 }

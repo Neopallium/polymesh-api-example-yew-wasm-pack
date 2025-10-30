@@ -1,10 +1,10 @@
-use yew::prelude::*;
+use leptos::*;
 
 use crate::components::accounts::Accounts;
 
-#[function_component]
-pub fn AccountsPage() -> Html {
-  html! {
+#[component]
+pub fn AccountsPage() -> impl IntoView {
+  view! {
       <div class="columns">
           <Accounts />
       </div>

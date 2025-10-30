@@ -1,13 +1,12 @@
-use yew::prelude::*;
+use leptos::*;
 
-use crate::providers::blocks::{BlocksContext, BlockItem};
+use crate::providers::blocks::{use_blocks, BlockItem};
 
-#[function_component]
-pub fn RecentBlocks() -> Html {
-  let blocks = use_context::<BlocksContext>().expect("Blocks context provided");
+#[component]
+pub fn RecentBlocks() -> impl IntoView {
+  let blocks = use_blocks();
 
-  let recent: Vec<_> = blocks.iter().map(|(_, b)| b).collect();
-  html! {
+  view! {
     <div class="column is-half">
         <table class="table is-fullwidth is-bordered">
             <thead>
@@ -16,18 +15,23 @@ pub fn RecentBlocks() -> Html {
                 </tr>
             </thead>
             <tbody>
-                { for recent.into_iter().rev().map(|b| view_block_item(b)) }
+                {move || {
+                    let recent: Vec<_> = blocks.get().iter().map(|(_, b)| b.clone()).collect();
+                    recent.into_iter().rev().map(|b| view_block_item(&b)).collect_view()
+                }}
             </tbody>
         </table>
     </div>
   }
 }
 
-fn view_block_item(item: &BlockItem) -> Html {
-  html! {
-      <tr key={ item.number.to_string() }>
-          <th>{ item.number }</th>
-          <td>{ item.hash.to_string() }</td>
+fn view_block_item(item: &BlockItem) -> impl IntoView {
+  let number = item.number;
+  let hash = item.hash.to_string();
+  view! {
+      <tr>
+          <th>{ number }</th>
+          <td>{ hash }</td>
           <td>{ "Alice" }</td>
       </tr>
   }

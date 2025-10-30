@@ -9,6 +9,7 @@ pub mod web3;
 pub use app::*;
 
 use wasm_bindgen::prelude::*;
+use leptos::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -20,6 +21,6 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 #[wasm_bindgen]
 pub fn run_app() -> Result<(), JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
-    yew::Renderer::<app::App>::new().render();
+    mount_to_body(|| view! { <App /> });
     Ok(())
 }

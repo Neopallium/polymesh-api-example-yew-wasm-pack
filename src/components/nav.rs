@@ -1,56 +1,50 @@
-use yew::prelude::*;
-use yew_router::prelude::*;
+use leptos::*;
+use leptos_router::*;
 
-use crate::pages::router::Route;
+#[component]
+pub fn Nav() -> impl IntoView {
+  let (navbar_active, set_navbar_active) = create_signal(false);
 
-#[function_component]
-pub fn Nav() -> Html {
-  let navbar_active = use_state_eq(|| false);
-
-  let toggle_navbar = {
-    let navbar_active = navbar_active.clone();
-
-    Callback::from(move |_| {
-      navbar_active.set(!*navbar_active);
-    })
+  let toggle_navbar = move |_| {
+    set_navbar_active.update(|active| *active = !*active);
   };
 
-  let active_class = if !*navbar_active { "is-active" } else { "" };
-
-  html! {
+  view! {
       <nav class="navbar is-primary" role="navigation" aria-label="main navigation">
           <div class="navbar-brand">
               <h1 class="navbar-item is-size-3">{ "Polymesh app" }</h1>
 
-              <button class={classes!("navbar-burger", "burger", active_class)}
-                  aria-label="menu" aria-expanded="false"
-                  onclick={toggle_navbar}
+              <button 
+                  class=move || if navbar_active.get() { "navbar-burger burger is-active" } else { "navbar-burger burger" }
+                  aria-label="menu" 
+                  aria-expanded="false"
+                  on:click=toggle_navbar
               >
                   <span aria-hidden="true"></span>
                   <span aria-hidden="true"></span>
                   <span aria-hidden="true"></span>
               </button>
           </div>
-          <div class={classes!("navbar-menu", active_class)}>
+          <div class=move || if navbar_active.get() { "navbar-menu is-active" } else { "navbar-menu" }>
               <div class="navbar-start">
-                  <Link<Route> classes={classes!("navbar-item")} to={Route::Accounts}>
+                  <A class="navbar-item" href="/accounts">
                       { "Accounts" }
-                  </Link<Route>>
+                  </A>
 
                   <div class="navbar-item has-dropdown is-hoverable">
                       <div class="navbar-link">
                           { "Network" }
                       </div>
                       <div class="navbar-dropdown">
-                          <Link<Route> classes={classes!("navbar-item")} to={Route::Explorer}>
+                          <A class="navbar-item" href="/">
                               { "Explorer" }
-                          </Link<Route>>
+                          </A>
                       </div>
                   </div>
 
-                  <Link<Route> classes={classes!("navbar-item")} to={Route::Settings}>
+                  <A class="navbar-item" href="/settings">
                       { "Settings" }
-                  </Link<Route>>
+                  </A>
               </div>
 
               <div class="navbar-end">

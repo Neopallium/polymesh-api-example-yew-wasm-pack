@@ -1,12 +1,12 @@
-use yew::prelude::*;
+use leptos::*;
 
-use crate::providers::accounts::{AccountsContext, AccountInfo};
+use crate::providers::accounts::{use_accounts, AccountInfo};
 
-#[function_component]
-pub fn Accounts() -> Html {
-  let accounts = use_context::<AccountsContext>().expect("Accounts context provided");
+#[component]
+pub fn Accounts() -> impl IntoView {
+  let (accounts, _) = use_accounts();
 
-  html! {
+  view! {
     <div class="column is-half">
         <table class="table is-fullwidth is-bordered">
             <thead>
@@ -15,19 +15,25 @@ pub fn Accounts() -> Html {
                 </tr>
             </thead>
             <tbody>
-                { for accounts.iter().map(|acc| view_account(acc)) }
+                {move || {
+                    accounts.get().iter().map(|acc| view_account(acc)).collect_view()
+                }}
             </tbody>
         </table>
     </div>
   }
 }
 
-fn view_account(item: &AccountInfo) -> Html {
-  html! {
-      <tr key={ item.name.clone() }>
-          <th>{ &item.name }</th>
-          <td>{ &item.address() }</td>
-          <td>{ &item.identity() }</td>
+fn view_account(item: &AccountInfo) -> impl IntoView {
+  let name = item.name.clone();
+  let address = item.address();
+  let identity = item.identity();
+  
+  view! {
+      <tr>
+          <th>{ name }</th>
+          <td>{ address }</td>
+          <td>{ identity }</td>
       </tr>
   }
 }

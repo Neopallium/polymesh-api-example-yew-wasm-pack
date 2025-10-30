@@ -1,8 +1,8 @@
-use yew::prelude::*;
+use leptos::*;
 
-#[function_component]
-pub fn RecentEvents() -> Html {
-  html! {
+#[component]
+pub fn RecentEvents() -> impl IntoView {
+  view! {
       <div class="column is-half">
           <table class="table is-fullwidth is-bordered">
               <thead>
